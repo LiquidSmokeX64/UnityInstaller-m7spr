@@ -1,0 +1,11 @@
+Thanks to Cyanogenmod Inc. for their great work bringing the AOSP experience to everyone without Nexus Devices, and all the unique features and fixes they bring to Android daily. And allowing everyone build from your repositories too of course.
+
+Me, of course. For making UnityROM-2 completely CM-based, fully modular build optimizations via commit commands, and having its own Repo with my changes and device dependencies included.
+Also for adding the UnityInstaller Sources. Optimizing any aspect of the build environment I could without ROM or Kernel breaks (many), and integrating my own custom, optimized, CM-Based, UnityKernel to the build too.
+
+Major additional credit goes to...
+@amarullz, @gruesomewolf, @IAmTheOneTheyCallNeo, @Captain_Throwback, LiquidSmooth, SaberMod for their major contributions to the project that made it all possible.
+
+So if you want to use part of this ROM for your own creative ideas, give credit where it's due please.
+
+Can you agree to this?

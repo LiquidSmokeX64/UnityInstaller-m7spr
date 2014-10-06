@@ -1,0 +1,333 @@
+﻿##
+#
+# AROMA Installer - LiquidSmokeX64
+#       (c) 2011-2012 by Ahmad Amarullah
+#           amarullz - xda-developers
+#           http://www.amarullz.com/
+#
+#       Binary Version  : 2.70b
+#       Binary Codename : Flamboyan
+#
+##
+
+##-Main Parameters-##
+
+ini_set("force_colorspace","rgba");
+ini_set("dp","4");
+
+ini_set("rom_name",             "UnityROM-2 ");
+ini_set("rom_version",          "v.2.5.0 ");
+ini_set("rom_author",           "LiquidSmokeX64");
+ini_set("rom_device",           "HTC One M7 Sprint Edition");
+
+calibrate("1.4072","31","1.3113","43","yes");
+ini_set("customkeycode_up",     "115");
+ini_set("customkeycode_down",   "114");
+ini_set("customkeycode_select", "102");
+
+fontresload( "0", "ttf/Roboto-Regular.ttf", "12" );
+fontresload( "1", "ttf/Roboto-Regular.ttf", "18" );
+
+##-Theme-##
+
+theme("ics");
+
+##-Greeting Page-##
+
+viewbox(
+    "UnityInstaller v.5.3.0",
+    "\n\n"+
+    "You are about to Install "+
+    ini_get("rom_name") + " by " + ini_get("rom_author") +  
+    "\n\n"+
+    "Version: " + ini_get("rom_version") + "\n\n"+
+    "Device: " + ini_get("rom_device") + "\n\n"+
+    "Press Next to continue the installation...",
+    "icons/cm"
+);
+
+##-License Page-##
+
+agreebox(
+  "Installation Agreement",
+  "Please read the Agreement...",
+  "icons/license",
+  readfile_aroma("agreement.txt"),
+  "Yes, I agree to these terms of use.",
+  "Agree or Abort the Installation."
+);
+
+##-Main Installation Page-##
+
+menubox(
+  "Installation Select",
+  "Choose an Installation type",
+  "icons/customize",
+  "ROM.prop",
+
+    "Install UnityROM-2","Begin ROM Installation Options","@install",
+	"Application Manager","Begin App Installation/Removal Options Only","@install"
+);
+
+##-Submenu for Choice 1 of Main Installation Page-##
+##-Cleaning Page-##
+
+if
+    file_getprop("/tmp/aroma/ROM.prop","selected") == "1"
+then
+
+menubox(
+  "ROM Cleaning Options",
+  "Choose an Installation method",
+  "icons/customize",
+  "CMCLEANING.prop",
+  
+  "Clean Installation","Delete System & Data Directories then Install","@install",
+  "Dirty Installation","Leave User Data & Update System only","@next"  
+  
+);
+
+else
+
+  writetmpfile(
+    "CMCLEANING.prop",
+      "selected=0\n"
+      
+  );
+endif;
+
+##-Submenu for Choice of 1 Cleaning Page-##
+##-System Options Page-##
+
+if
+    file_getprop("/tmp/aroma/CMCLEANING.prop","selected") == "1"
+then
+menubox(
+  "Core Options",
+  "Choose a System Configuration",
+  "icons/customize",
+  "CORESELECT.prop",
+    
+  "System Mods","Change default system settings","@install",
+  "Default","Use default or previous configuration","@next"
+  );
+
+else
+
+  writetmpfile(
+    "CORESELECT.prop",
+      "selected=0\n"
+      
+  );
+endif;
+
+##-Submenu for Choice 1 of System Options Page-##
+##-LCD DPI Page-##
+
+if
+    file_getprop("/tmp/aroma/CORESELECT.prop","selected") == "1"
+then
+menubox(
+  "LCD Density Options",
+  "Choose a DPI",
+  "icons/customize",
+  "CORE.prop",
+    
+  "320 DPI","","@install",  
+  "280 DPI","","@install",
+  "240 DPI","","@install",
+  "180 DPI","","@install",  
+  "160 DPI","","@install",
+  "Default DPI","","@next"  
+   
+);
+else
+
+  writetmpfile(
+    "CORE.prop",
+      "selected=0\n"
+      
+  );
+endif;
+
+##-Submenu for Choice of 2 Cleaning Page-##
+##-System Options Page-##
+
+if
+    file_getprop("/tmp/aroma/CMCLEANING.prop","selected") == "2"
+then
+menubox(
+  "Core Options",
+  "Choose a System Configuration",
+  "icons/customize",
+  "CORESELECT-2.prop",
+    
+  "System Mods","Change default system settings","@install",
+  "Default","Use default or previous configuration","@next"
+  );
+
+else
+
+  writetmpfile(
+    "CORESELECT-2.prop",
+      "selected=0\n"
+      
+  );
+endif;
+
+##-Submenu for Choice 1 of System Options Page-##
+##-LCD DPI Page-##
+
+if
+    file_getprop("/tmp/aroma/CORESELECT-2.prop","selected") == "1"
+then
+menubox(
+  "LCD Density Options",
+  "Choose a DPI",
+  "icons/customize",
+  "CORE-2.prop",
+    
+  "320 DPI","","@install",  
+  "280 DPI","","@install",
+  "240 DPI","","@install",
+  "180 DPI","","@install",  
+  "160 DPI","","@install",
+  "Default DPI","","@next"  
+   
+);
+else
+
+  writetmpfile(
+    "CORE-2.prop",
+      "selected=0\n"
+      
+  );
+endif;
+
+##-Submenu for Choice 2 of Installation Page-##
+##-Bypass ROM Installation-##
+
+if
+    file_getprop("/tmp/aroma/ROM.prop","selected") == "2"
+then
+
+  writetmpfile(
+    "ROM.prop",
+      "selected=0\n"
+      
+  );
+endif;
+
+##-Submenu for Choice 2 of System Options Page-##
+##-Bypass System Options Installation-##
+
+if
+    file_getprop("/tmp/aroma/CORESELECT.prop","selected") == "2"
+then
+
+  writetmpfile(
+    "NOCORE.prop",
+      "selected=0\n"
+      
+  );
+endif;
+
+
+if
+    file_getprop("/tmp/aroma/CORESELECT-2.prop","selected") == "2"
+then
+
+  writetmpfile(
+    "NOCORE-2.prop",
+      "selected=0\n"
+      
+  );
+endif;
+##-Submenu for Choice 6 of LCD Page-##
+##-Bypass LCD Installation-##
+
+if
+    file_getprop("/tmp/aroma/CORE.prop","selected") == "6"
+then
+
+  writetmpfile(
+    "NOLCD.prop",
+      "selected=0\n"
+      
+  );
+endif;
+
+##-Submenu for Choice 6 of LCD Page-##
+##-Bypass LCD Installation-##
+
+if
+    file_getprop("/tmp/aroma/CORE-2.prop","selected") == "6"
+then
+
+  writetmpfile(
+    "NOLCD-2.prop",
+      "selected=0\n"
+      
+  );
+endif;
+
+##-System App Removal Page-##
+
+checkbox(
+  "App Remover",
+  "Check all of the Apps you want to remove",
+  "icons/apps",
+  "sysapp.prop",
+  
+		"Remove Browser",       "",  0,  
+		"Remove Apollo",            "",  0,
+		"Remove Email",      "",  0,
+		"Remove Gallery",      "",  0,
+		"Remove Calculator",          "",  0,
+		"Remove Calendar",  "",  0,
+		"Remove DSP Manager",       "",  0,
+		"Remove File Manager",             "",  0,
+		"Remove Terminal Emulator",            "",  0,
+		"Remove Torch",      "",  0,
+		"Remove Movie Studio",      "",  0,
+		"Remove Sound Recorder",      "",  0
+	
+	
+);
+
+##-ROM Installer UI Page-##
+
+install(
+  "Installing",
+  "Installing UnityROM-2... \nThis can take a minute or two...",
+  "icons/install"
+);
+
+# Set Next Text fo Finish
+ini_set("text_next", "Finish");
+
+##-End of Installation Page-##
+
+viewbox(
+  "Installation Completed",
+  "Congratulations...\n\n"+
+   ini_get("rom_name") + 
+   ini_get("rom_version") +
+  "has been installed successfully.\n\n"+
+  "Please press the Finish button and Reboot your device.\n\nEnjoy.",
+  "icons/cm"
+);
+
+##-Reboot Warning Box-##
+
+if
+  confirm(
+      "Reboot Warning",
+      "Please reboot to complete ROM installation",
+      "icons/info",
+      "Reboot Now",
+      "Reboot Later"
+  )=="yes"
+then
+  reboot("onfinish");
+endif;

@@ -1,0 +1,458 @@
+##---- ROM Config
+if
+    file_getprop("/tmp/aroma/CMCLEANING.prop","selected") == "1"
+then
+    ui_print(" ");
+	ui_print("@Installing ROM Clean");
+	set_progress(0.10);
+	ui_print(" ");
+    ui_print("@Checking for correct device information");
+    assert(getprop("ro.product.device") == "m7wls" || getprop("ro.build.product") == "m7wls" || getprop("ro.product.device") == "m7spr" || getprop("ro.build.product") == "m7spr" || abort("This package is for \"m7wls,m7spr\" devices; this is a \"" + getprop("ro.product.device") + "\"."););
+    ui_print(" ");
+    ui_print("@Your device is HTC One M7 - Sprint(m7spr)");
+    set_progress(0.20);
+	format("ext4", "EMMC", "/dev/block/platform/msm_sdcc.1/by-name/system", "0", "/system");
+    mount("ext4", "EMMC", "/dev/block/platform/msm_sdcc.1/by-name/system", "/system");
+	ui_print(" ");
+    ui_print("@Cleaning... ");
+	delete_recursive("/cache");
+	delete_recursive("/data/dalvik-cache");
+	delete_recursive("/dalvik/dalvik-cache");	  
+	delete_recursive("/system");
+	package_extract_file("features/tools/wipe.sh", "/tmp/wipe.sh");
+	package_extract_file("features/tools/bash", "/tmp/bash");
+	set_perm(0, 0, 0777, "/tmp/wipe.sh");
+	set_perm(0, 0, 0777, "/tmp/bash");
+	run_program("/tmp/wipe.sh");
+    ui_print(" ");	
+    ui_print("@Finished Cleaning ");
+	unmount("/system");
+	mount("ext4", "EMMC", "/dev/block/platform/msm_sdcc.1/by-name/userdata", "/data");
+    package_extract_file("system/bin/otasigcheck.sh", "/tmp/otasigcheck.sh");
+    package_extract_file("META-INF/org/cyanogenmod/releasekey", "/tmp/releasekey");
+    set_perm( 0, 0, 0755, "/tmp/otasigcheck.sh");
+    run_program("/tmp/otasigcheck.sh");
+    sha1_check(read_file("/tmp/releasekey"),"7241e92725436afc79389d4fc2333a2aa8c20230") && abort("Can't install this package on top of incompatible data. Please try another package or run a factory reset");
+    unmount("/data");
+    mount("ext4", "EMMC", "/dev/block/platform/msm_sdcc.1/by-name/system", "/system");
+    package_extract_file("system/bin/backuptool.sh", "/tmp/backuptool.sh");
+    package_extract_file("system/bin/backuptool.functions", "/tmp/backuptool.functions");
+    set_perm( 0, 0, 0755, "/tmp/backuptool.sh");
+    set_perm( 0, 0, 0644, "/tmp/backuptool.functions");
+    run_program("/tmp/backuptool.sh", "backup");
+	unmount("/system");
+	set_progress(0.45);
+	format("ext4", "EMMC", "/dev/block/platform/msm_sdcc.1/by-name/system", "0", "/system");
+    mount("ext4", "EMMC", "/dev/block/platform/msm_sdcc.1/by-name/system", "/system");
+	ui_print(" ");
+	ui_print("@Installing ROM...");
+	package_extract_dir("recovery", "/system");
+	package_extract_dir("system", "/system"); 
+	set_progress(0.67);	
+endif;
+
+if
+    file_getprop("/tmp/aroma/CMCLEANING.prop","selected") == "2"
+then
+    ui_print(" ");
+    ui_print("@Installing ROM Dirty");
+    set_progress(0.10);
+    ui_print(" ");
+    ui_print("@Checking for correct device information");
+    assert(getprop("ro.product.device") == "m7wls" || getprop("ro.build.product") == "m7wls" || getprop("ro.product.device") == "m7spr" || getprop("ro.build.product") == "m7spr" || abort("This package is for \"m7wls,m7spr\" devices; this is a \"" + getprop("ro.product.device") + "\"."););
+    ui_print(" ");
+    ui_print("@Your device is HTC One M7 - Sprint(m7spr)");
+    set_progress(0.20);
+	mount("ext4", "EMMC", "/dev/block/platform/msm_sdcc.1/by-name/userdata", "/data");
+    package_extract_file("system/bin/otasigcheck.sh", "/tmp/otasigcheck.sh");
+    package_extract_file("META-INF/org/cyanogenmod/releasekey", "/tmp/releasekey");
+    set_perm( 0, 0, 0755, "/tmp/otasigcheck.sh");
+    run_program("/tmp/otasigcheck.sh");
+    sha1_check(read_file("/tmp/releasekey"),"7241e92725436afc79389d4fc2333a2aa8c20230") && abort("Can't install this package on top of incompatible data. Please try another package or run a factory reset");
+    unmount("/data");
+    mount("ext4", "EMMC", "/dev/block/platform/msm_sdcc.1/by-name/system", "/system");
+    package_extract_file("system/bin/backuptool.sh", "/tmp/backuptool.sh");
+    package_extract_file("system/bin/backuptool.functions", "/tmp/backuptool.functions");
+    set_perm( 0, 0, 0755, "/tmp/backuptool.sh");
+    set_perm( 0, 0, 0644, "/tmp/backuptool.functions");
+    run_program("/tmp/backuptool.sh", "backup");
+	unmount("/system");
+    set_progress(0.45);
+	format("ext4", "EMMC", "/dev/block/platform/msm_sdcc.1/by-name/system", "0", "/system");
+    mount("ext4", "EMMC", "/dev/block/platform/msm_sdcc.1/by-name/system", "/system");
+    ui_print(" ");
+    ui_print("@Installing ROM...");
+	package_extract_dir("recovery", "/system");
+	package_extract_dir("system", "/system");
+	set_progress(0.67);	
+endif;
+
+##---- User Options
+ui_print(" ");
+ui_print("@Applying Core Settings");
+
+##---- Core Options-1
+set_progress(0.77);	
+if
+    file_getprop("/tmp/aroma/CORE.prop","selected") == "1"
+then
+	ui_print("Setting LCD to 320 DPI");
+	delete("/system/build.prop");
+	package_extract_dir("features/dpi/320", "/system");	
+endif;
+
+if
+    file_getprop("/tmp/aroma/CORE.prop","selected") == "2"
+then
+	ui_print("Setting LCD to 280 DPI");
+	delete("/system/build.prop");
+	package_extract_dir("features/dpi/280", "/system");
+endif;
+
+if
+    file_getprop("/tmp/aroma/CORE.prop","selected") == "3"
+then
+	ui_print("Setting LCD to 240 DPI");
+	delete("/system/build.prop");
+	package_extract_dir("features/dpi/240", "/system");
+endif;
+
+if
+    file_getprop("/tmp/aroma/CORE.prop","selected") == "4"
+then
+	ui_print("Setting LCD to 180 DPI");
+	delete("/system/build.prop");
+	package_extract_dir("features/dpi/180", "/system");
+endif;
+
+if
+    file_getprop("/tmp/aroma/CORE.prop","selected") == "5"
+then
+	ui_print("Setting LCD to 160 DPI");
+	delete("/system/build.prop");
+	package_extract_dir("features/dpi/160", "/system");
+endif;
+
+##---- Core Options-2
+set_progress(0.77);	
+if
+    file_getprop("/tmp/aroma/CORE-2.prop","selected") == "1"
+then
+	ui_print("Setting LCD to 320 DPI");
+	delete("/system/build.prop");
+	package_extract_dir("features/dpi/320", "/system");	
+endif;
+
+if
+    file_getprop("/tmp/aroma/CORE-2.prop","selected") == "2"
+then
+	ui_print("Setting LCD to 280 DPI");
+	delete("/system/build.prop");
+	package_extract_dir("features/dpi/280", "/system");
+endif;
+
+if
+    file_getprop("/tmp/aroma/CORE-2.prop","selected") == "3"
+then
+	ui_print("Setting LCD to 240 DPI");
+	delete("/system/build.prop");
+	package_extract_dir("features/dpi/240", "/system");
+endif;
+
+if
+    file_getprop("/tmp/aroma/CORE-2.prop","selected") == "4"
+then
+	ui_print("Setting LCD to 180 DPI");
+	delete("/system/build.prop");
+	package_extract_dir("features/dpi/180", "/system");
+endif;
+
+if
+    file_getprop("/tmp/aroma/CORE-2.prop","selected") == "5"
+then
+	ui_print("Setting LCD to 160 DPI");
+	delete("/system/build.prop");
+	package_extract_dir("features/dpi/160", "/system");
+endif;
+
+##---- App Remover
+      set_progress(0.95);	
+	  ui_print(" ");
+      ui_print("@Removing System Apps");
+      if file_getprop("/tmp/aroma-data/sysapp.prop","item.0.1") == "1" then
+         ui_print("Removing Browser");
+         delete("/system/app/Browser.apk");
+      endif;
+
+      if file_getprop("/tmp/aroma-data/sysapp.prop","item.0.2") == "1" then
+         ui_print("Removing Apollo");
+         delete("/system/app/Apollo.apk");
+      endif;
+
+      if	file_getprop("/tmp/aroma-data/sysapp.prop","item.0.3") == "1" then
+         ui_print("Removing Email");
+         delete("/system/app/Email.apk");
+		 delete("/system/app/Exchange2.apk");
+      endif;
+
+      if file_getprop("/tmp/aroma-data/sysapp.prop","item.0.4") == "1" then
+         ui_print("Removing Gallery");
+         delete("/system/app/Gallery2.apk");
+      endif;
+
+      if file_getprop("/tmp/aroma-data/sysapp.prop","item.0.5") == "1" then
+         ui_print("Removing Calculator");
+         delete("/system/app/Calculator.apk");
+      endif;
+
+      if file_getprop("/tmp/aroma-data/sysapp.prop","item.0.6") == "1" then
+         ui_print("Removing Calendar");
+         delete("/system/app/Calendar.apk");
+      endif;
+
+      if file_getprop("/tmp/aroma-data/sysapp.prop","item.0.7") == "1" then
+         ui_print("Removing DSP Manager");
+         delete("/system/app/DSPManager.apk");
+      endif;
+
+      if file_getprop("/tmp/aroma-data/sysapp.prop","item.0.8") == "1" then
+         ui_print("Removing File Manager");
+         delete("/system/app/CMFileManager.apk");
+      endif;
+	  
+	  if file_getprop("/tmp/aroma-data/sysapp.prop","item.0.9") == "1" then
+         ui_print("Removing Terminal Emulator");
+         delete("/system/app/Term.apk");
+      endif;
+    
+	  if file_getprop("/tmp/aroma-data/sysapp.prop","item.0.10") == "1" then
+         ui_print("Removing Torch");
+         delete("/system/app/Torch.apk");
+      endif;
+    
+	  if file_getprop("/tmp/aroma-data/sysapp.prop","item.0.11") == "1" then
+         ui_print("Removing Movie Studio");
+         delete("/system/app/VideoEditor.apk");
+      endif;
+
+	  if file_getprop("/tmp/aroma-data/sysapp.prop","item.0.12") == "1" then
+         ui_print("Removing Sound Recorder");
+         delete("/system/app/SoundRecorder.apk");
+      endif;
+	  
+set_progress(0.97);
+ui_print(" ");
+ui_print("@Symlinking...");
+symlink("../bin/fsck.f2fs", "/system/bin/dump.f2fs");
+symlink("../xbin/su", "/system/bin/su");
+symlink("/firmware/mdm/image/acdb.mbn", "/system/vendor/firmware/acdb.mbn");
+symlink("/firmware/mdm/image/apps.mbn", "/system/vendor/firmware/apps.mbn");
+symlink("/firmware/mdm/image/dsp1.mbn", "/system/vendor/firmware/dsp1.mbn");
+symlink("/firmware/mdm/image/dsp2.mbn", "/system/vendor/firmware/dsp2.mbn");
+symlink("/firmware/mdm/image/dsp3.mbn", "/system/vendor/firmware/dsp3.mbn");
+symlink("/firmware/mdm/image/efs1.mbn", "/system/vendor/firmware/efs1.mbn");
+symlink("/firmware/mdm/image/efs2.mbn", "/system/vendor/firmware/efs2.mbn");
+symlink("/firmware/mdm/image/efs3.mbn", "/system/vendor/firmware/efs3.mbn");
+symlink("/firmware/mdm/image/htccdma.mbn", "/system/vendor/firmware/htccdma.mbn");
+symlink("/firmware/mdm/image/htccnv.mbn", "/system/vendor/firmware/htccnv.mbn");
+symlink("/firmware/mdm/image/htcnvmfg.mbn", "/system/vendor/firmware/htcnvmfg.mbn");
+symlink("/firmware/mdm/image/htcrfnv.mbn", "/system/vendor/firmware/htcrfnv.mbn");
+symlink("/firmware/mdm/image/htcssmem.mbn", "/system/vendor/firmware/htcssmem.mbn");
+symlink("/firmware/mdm/image/htcuserd.mbn", "/system/vendor/firmware/htcuserd.mbn");
+symlink("/firmware/mdm/image/mdm_acdb.img", "/system/vendor/firmware/mdm_acdb.img");
+symlink("/firmware/mdm/image/rpm.mbn", "/system/vendor/firmware/rpm.mbn");
+symlink("/firmware/mdm/image/sbl1.mbn", "/system/vendor/firmware/sbl1.mbn");
+symlink("/firmware/mdm/image/sbl2.mbn", "/system/vendor/firmware/sbl2.mbn");
+symlink("/firmware/q6/q6.b00", "/system/vendor/firmware/q6.b00");
+symlink("/firmware/q6/q6.b01", "/system/vendor/firmware/q6.b01");
+symlink("/firmware/q6/q6.b03", "/system/vendor/firmware/q6.b03");
+symlink("/firmware/q6/q6.b04", "/system/vendor/firmware/q6.b04");
+symlink("/firmware/q6/q6.b05", "/system/vendor/firmware/q6.b05");
+symlink("/firmware/q6/q6.b06", "/system/vendor/firmware/q6.b06");
+symlink("/firmware/q6/q6.mdt", "/system/vendor/firmware/q6.mdt");
+symlink("Roboto-Bold.ttf", "/system/fonts/DroidSans-Bold.ttf");
+symlink("Roboto-Regular.ttf", "/system/fonts/DroidSans.ttf");
+symlink("busybox", "/system/xbin/[", "/system/xbin/[[",
+        "/system/xbin/adjtimex", "/system/xbin/arp", "/system/xbin/ash",
+        "/system/xbin/awk", "/system/xbin/base64", "/system/xbin/basename",
+        "/system/xbin/bbconfig", "/system/xbin/blkid", "/system/xbin/blockdev",
+        "/system/xbin/brctl", "/system/xbin/bunzip2", "/system/xbin/bzcat",
+        "/system/xbin/bzip2", "/system/xbin/cal", "/system/xbin/cat",
+        "/system/xbin/catv", "/system/xbin/chattr", "/system/xbin/chcon",
+        "/system/xbin/chgrp", "/system/xbin/chmod", "/system/xbin/chown",
+        "/system/xbin/chroot", "/system/xbin/chvt", "/system/xbin/clear",
+        "/system/xbin/cmp", "/system/xbin/comm", "/system/xbin/cp",
+        "/system/xbin/cpio", "/system/xbin/crond", "/system/xbin/crontab",
+        "/system/xbin/cut", "/system/xbin/date", "/system/xbin/dc",
+        "/system/xbin/dd", "/system/xbin/deallocvt", "/system/xbin/depmod",
+        "/system/xbin/devmem", "/system/xbin/df", "/system/xbin/diff",
+        "/system/xbin/dirname", "/system/xbin/dmesg", "/system/xbin/dnsd",
+        "/system/xbin/dos2unix", "/system/xbin/du", "/system/xbin/echo",
+        "/system/xbin/ed", "/system/xbin/egrep", "/system/xbin/env",
+        "/system/xbin/expand", "/system/xbin/expr", "/system/xbin/false",
+        "/system/xbin/fbsplash", "/system/xbin/fdisk", "/system/xbin/fgconsole",
+        "/system/xbin/fgrep", "/system/xbin/find", "/system/xbin/findfs",
+        "/system/xbin/flash_lock", "/system/xbin/flash_unlock",
+        "/system/xbin/flashcp", "/system/xbin/flock", "/system/xbin/fold",
+        "/system/xbin/free", "/system/xbin/freeramdisk", "/system/xbin/fstrim",
+        "/system/xbin/fsync", "/system/xbin/ftpget", "/system/xbin/ftpput",
+        "/system/xbin/fuser", "/system/xbin/getenforce", "/system/xbin/getopt",
+        "/system/xbin/getsebool", "/system/xbin/grep", "/system/xbin/groups",
+        "/system/xbin/gunzip", "/system/xbin/gzip", "/system/xbin/halt",
+        "/system/xbin/head", "/system/xbin/hexdump", "/system/xbin/hwclock",
+        "/system/xbin/id", "/system/xbin/ifconfig", "/system/xbin/inetd",
+        "/system/xbin/insmod", "/system/xbin/install", "/system/xbin/ionice",
+        "/system/xbin/iostat", "/system/xbin/ip", "/system/xbin/kill",
+        "/system/xbin/killall", "/system/xbin/killall5", "/system/xbin/less",
+        "/system/xbin/ln", "/system/xbin/losetup", "/system/xbin/ls",
+        "/system/xbin/lsattr", "/system/xbin/lsmod", "/system/xbin/lspci",
+        "/system/xbin/lsusb", "/system/xbin/lzcat", "/system/xbin/lzma",
+        "/system/xbin/lzop", "/system/xbin/lzopcat", "/system/xbin/man",
+        "/system/xbin/matchpathcon", "/system/xbin/md5sum", "/system/xbin/mesg",
+        "/system/xbin/mkdir", "/system/xbin/mke2fs", "/system/xbin/mkfifo",
+        "/system/xbin/mkfs.ext2", "/system/xbin/mkfs.vfat",
+        "/system/xbin/mknod", "/system/xbin/mkswap", "/system/xbin/mktemp",
+        "/system/xbin/modinfo", "/system/xbin/modprobe", "/system/xbin/more",
+        "/system/xbin/mount", "/system/xbin/mountpoint", "/system/xbin/mpstat",
+        "/system/xbin/mv", "/system/xbin/nanddump", "/system/xbin/nandwrite",
+        "/system/xbin/nbd-client", "/system/xbin/netstat", "/system/xbin/nice",
+        "/system/xbin/nmeter", "/system/xbin/nohup", "/system/xbin/nslookup",
+        "/system/xbin/ntpd", "/system/xbin/od", "/system/xbin/openvt",
+        "/system/xbin/patch", "/system/xbin/pgrep", "/system/xbin/pidof",
+        "/system/xbin/ping", "/system/xbin/pipe_progress", "/system/xbin/pkill",
+        "/system/xbin/pmap", "/system/xbin/poweroff", "/system/xbin/printenv",
+        "/system/xbin/printf", "/system/xbin/ps", "/system/xbin/pstree",
+        "/system/xbin/pwd", "/system/xbin/pwdx", "/system/xbin/rdate",
+        "/system/xbin/rdev", "/system/xbin/readlink", "/system/xbin/realpath",
+        "/system/xbin/renice", "/system/xbin/reset", "/system/xbin/resize",
+        "/system/xbin/restorecon", "/system/xbin/rev", "/system/xbin/rm",
+        "/system/xbin/rmdir", "/system/xbin/rmmod", "/system/xbin/route",
+        "/system/xbin/run-parts", "/system/xbin/runcon", "/system/xbin/rx",
+        "/system/xbin/sed", "/system/xbin/selinuxenabled", "/system/xbin/seq",
+        "/system/xbin/sestatus", "/system/xbin/setconsole",
+        "/system/xbin/setenforce", "/system/xbin/setfiles",
+        "/system/xbin/setkeycodes", "/system/xbin/setsebool",
+        "/system/xbin/setserial", "/system/xbin/setsid", "/system/xbin/sh",
+        "/system/xbin/sha1sum", "/system/xbin/sha256sum",
+        "/system/xbin/sha3sum", "/system/xbin/sha512sum", "/system/xbin/sleep",
+        "/system/xbin/smemcap", "/system/xbin/sort", "/system/xbin/split",
+        "/system/xbin/stat", "/system/xbin/strings", "/system/xbin/stty",
+        "/system/xbin/sum", "/system/xbin/swapoff", "/system/xbin/swapon",
+        "/system/xbin/sync", "/system/xbin/sysctl", "/system/xbin/tac",
+        "/system/xbin/tail", "/system/xbin/tar", "/system/xbin/taskset",
+        "/system/xbin/tee", "/system/xbin/telnet", "/system/xbin/telnetd",
+        "/system/xbin/test", "/system/xbin/tftp", "/system/xbin/tftpd",
+        "/system/xbin/time", "/system/xbin/timeout", "/system/xbin/top",
+        "/system/xbin/touch", "/system/xbin/tr", "/system/xbin/traceroute",
+        "/system/xbin/true", "/system/xbin/ttysize", "/system/xbin/tune2fs",
+        "/system/xbin/umount", "/system/xbin/uname", "/system/xbin/uncompress",
+        "/system/xbin/unexpand", "/system/xbin/uniq", "/system/xbin/unix2dos",
+        "/system/xbin/unlzma", "/system/xbin/unlzop", "/system/xbin/unxz",
+        "/system/xbin/unzip", "/system/xbin/uptime", "/system/xbin/usleep",
+        "/system/xbin/uudecode", "/system/xbin/uuencode", "/system/xbin/vi",
+        "/system/xbin/watch", "/system/xbin/wc", "/system/xbin/wget",
+        "/system/xbin/which", "/system/xbin/whoami", "/system/xbin/xargs",
+        "/system/xbin/xz", "/system/xbin/xzcat", "/system/xbin/yes",
+        "/system/xbin/zcat");
+symlink("libGLESv2.so", "/system/lib/libGLESv3.so");
+symlink("logcat", "/system/bin/lolcat");
+symlink("mksh", "/system/bin/sh");
+symlink("mount.exfat", "/system/bin/fsck.exfat",
+        "/system/bin/mkfs.exfat");
+symlink("pigz", "/system/xbin/unpigz");
+symlink("toolbox", "/system/bin/cat", "/system/bin/chcon",
+        "/system/bin/chmod", "/system/bin/chown", "/system/bin/clear",
+        "/system/bin/cmp", "/system/bin/cp", "/system/bin/date",
+        "/system/bin/dd", "/system/bin/df", "/system/bin/dmesg",
+        "/system/bin/du", "/system/bin/getenforce", "/system/bin/getevent",
+        "/system/bin/getprop", "/system/bin/getsebool", "/system/bin/grep",
+        "/system/bin/hd", "/system/bin/id", "/system/bin/ifconfig",
+        "/system/bin/iftop", "/system/bin/insmod", "/system/bin/ioctl",
+        "/system/bin/ionice", "/system/bin/kill", "/system/bin/ln",
+        "/system/bin/load_policy", "/system/bin/log", "/system/bin/ls",
+        "/system/bin/lsmod", "/system/bin/lsof", "/system/bin/md5",
+        "/system/bin/mkdir", "/system/bin/mkswap", "/system/bin/mount",
+        "/system/bin/mv", "/system/bin/nandread", "/system/bin/netstat",
+        "/system/bin/newfs_msdos", "/system/bin/notify", "/system/bin/printenv",
+        "/system/bin/ps", "/system/bin/r", "/system/bin/readlink",
+        "/system/bin/renice", "/system/bin/restart", "/system/bin/restorecon",
+        "/system/bin/rm", "/system/bin/rmdir", "/system/bin/rmmod",
+        "/system/bin/route", "/system/bin/runcon", "/system/bin/schedtop",
+        "/system/bin/sendevent", "/system/bin/setconsole",
+        "/system/bin/setenforce", "/system/bin/setfattr", "/system/bin/setprop",
+        "/system/bin/setsebool", "/system/bin/sleep", "/system/bin/smd",
+        "/system/bin/start", "/system/bin/stop", "/system/bin/swapoff",
+        "/system/bin/swapon", "/system/bin/sync", "/system/bin/top",
+        "/system/bin/touch", "/system/bin/umount", "/system/bin/uptime",
+        "/system/bin/vmstat", "/system/bin/watchprops",
+        "/system/bin/wipe");
+ui_print(" ");
+ui_print("@Setting Permissions");
+set_perm_recursive( 0, 0, 0755, 0644, "/system");
+set_perm_recursive( 0, 0, 0755, 0755, "/system/addon.d");
+set_perm_recursive( 0, 2000, 0755, 0755, "/system/bin");
+set_perm( 0, 2000, 0755, "/system/bin/app_process");
+set_perm( 0, 2000, 0755, "/system/bin/clatd");
+set_perm( 0, 2000, 0755, "/system/bin/debuggerd");
+set_perm( 0, 2000, 0755, "/system/bin/dhcpcd");
+set_perm( 0, 2000, 0755, "/system/bin/dnsmasq");
+set_perm( 0, 2000, 0755, "/system/bin/drmserver");
+set_perm( 0, 2000, 0755, "/system/bin/efsks");
+set_perm( 0, 2000, 0755, "/system/bin/hostapd");
+set_perm( 0, 2000, 0755, "/system/bin/installd");
+set_perm( 0, 2000, 0755, "/system/bin/keystore");
+set_perm( 0, 2000, 0755, "/system/bin/ks");
+set_perm( 0, 2000, 0755, "/system/bin/mediaserver");
+set_perm( 0, 2000, 0755, "/system/bin/mksh");
+set_perm( 0, 2000, 0755, "/system/bin/mtpd");
+set_perm( 0, 3003, 02750, "/system/bin/netcfg");
+set_perm( 0, 2000, 0755, "/system/bin/netd");
+set_perm( 0, 0, 0755, "/system/bin/ping");
+set_perm( 0, 2000, 0755, "/system/bin/pppd");
+set_perm( 0, 2000, 0755, "/system/bin/qcks");
+set_perm( 0, 2000, 0755, "/system/bin/racoon");
+set_perm( 0, 2000, 0755, "/system/bin/rild");
+set_perm( 0, 2000, 0750, "/system/bin/run-as");
+set_perm( 0, 2000, 0755, "/system/bin/sdcard");
+set_perm( 0, 2000, 0755, "/system/bin/servicemanager");
+set_perm( 0, 2000, 0755, "/system/bin/surfaceflinger");
+set_perm( 0, 2000, 0755, "/system/bin/vold");
+set_perm( 0, 2000, 0755, "/system/bin/wpa_supplicant");
+set_perm_recursive( 0, 0, 0755, 0644, "/system/etc/dhcpcd");
+set_perm( 1014, 2000, 0550, "/system/etc/dhcpcd/dhcpcd-run-hooks");
+set_perm_recursive( 0, 2000, 0755, 0755, "/system/etc/init.d");
+set_perm( 0, 0, 0755, "/system/etc/init.d");
+set_perm( 0, 0, 0544, "/system/etc/install-cm-recovery.sh");
+set_perm_recursive( 0, 0, 0755, 0555, "/system/etc/ppp");
+set_perm( 0, 0, 0644, "/system/recovery-from-boot.p");
+set_perm( 0, 2000, 0755, "/system/vendor");
+set_perm_recursive( 0, 2000, 0755, 0644, "/system/vendor/etc");
+set_perm( 0, 0, 0644, "/system/vendor/etc/audio_effects.conf");
+set_perm_recursive( 0, 2000, 0755, 0644, "/system/vendor/firmware");
+set_perm( 0, 2000, 0755, "/system/vendor/firmware/keymaster");
+set_perm( 0, 2000, 0755, "/system/vendor/lib");
+set_perm( 0, 2000, 0755, "/system/vendor/lib/egl");
+set_perm_recursive( 0, 2000, 0755, 0644, "/system/vendor/lib/hw");
+set_perm( 0, 0, 0644, "/system/vendor/lib/hw/power.msm8960.so");
+set_perm_recursive( 0, 2000, 0755, 0755, "/system/xbin");
+set_perm( 0, 0, 06755, "/system/xbin/librank");
+set_perm( 0, 0, 06755, "/system/xbin/procmem");
+set_perm( 0, 0, 06755, "/system/xbin/procrank");
+set_perm( 0, 0, 06755, "/system/xbin/su");
+delete("/system/bin/otasigcheck.sh");
+package_extract_file("system/bin/backuptool.sh", "/tmp/backuptool.sh");
+package_extract_file("system/bin/backuptool.functions", "/tmp/backuptool.functions");
+set_perm( 0, 0, 0755, "/tmp/backuptool.sh");
+set_perm( 0, 0, 0644, "/tmp/backuptool.functions");
+run_program("/tmp/backuptool.sh", "restore");
+delete("/system/bin/backuptool.sh");
+delete("/system/bin/backuptool.functions");
+ui_print(" ");
+ui_print("@Installing Kernel");
+package_extract_file("boot.img", "/dev/block/platform/msm_sdcc.1/by-name/boot");
+set_progress(0.99);
+ui_print(" ");
+ui_print("@Finished");
+unmount("/system");
+unmount("/data");
+
